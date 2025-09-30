@@ -1,14 +1,12 @@
 package com.epicness.neoneffect;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 public class Renderer {
 
@@ -16,30 +14,22 @@ public class Renderer {
     private final SpriteBatch batch;
     private final OrthographicCamera camera;
     private FrameBuffer fboA, fboB;
-    private ShaderProgram horizontalBlurShader, verticalBlurShader;
-    private ShaderProgram horizontalBlurShader4, horizontalBlurShader8;
-    private ShaderProgram verticalBlurShader4, verticalBlurShader8;
+    private Shader horizontalBlurShader, verticalBlurShader;
     private float blurRadius;
 
     public Renderer() {
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         blurRadius = 4f;
-        loadShaderFiles();
         // Create the FrameBuffer
         // Use the screen dimensions
         fboA = new FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
         fboB = new FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
     }
 
-    private void loadShaderFiles() {
-        FileHandle vertex = Gdx.files.internal("vertex.vert");
-        horizontalBlurShader4 = new ShaderProgram(vertex, Gdx.files.internal("horizontalBlur4.frag"));
-        verticalBlurShader4 = new ShaderProgram(vertex, Gdx.files.internal("verticalBlur4.frag"));
-        horizontalBlurShader8 = new ShaderProgram(vertex, Gdx.files.internal("horizontalBlur8.frag"));
-        verticalBlurShader8 = new ShaderProgram(vertex, Gdx.files.internal("verticalBlur8.frag"));
-        horizontalBlurShader = horizontalBlurShader4;
-        verticalBlurShader = verticalBlurShader4;
+    public void init() {
+        horizontalBlurShader = stuff.getHorizontalBlurShader();
+        verticalBlurShader = stuff.getVerticalBlurShader();
     }
 
     public void render() {
@@ -67,10 +57,10 @@ public class Renderer {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        batch.setShader(horizontalBlurShader);
+        batch.setShader(horizontalBlurShader.getShaderProgram());
         horizontalBlurShader.bind();
-        horizontalBlurShader.setUniformf("u_resolution_x", Gdx.graphics.getWidth());
-        horizontalBlurShader.setUniformf("u_radius", blurRadius);
+        horizontalBlurShader.setUniformF("u_resolution_x", Gdx.graphics.getWidth());
+        horizontalBlurShader.setUniformF("u_radius", blurRadius);
 
         batch.begin();
         Texture fboATexture = fboA.getColorBufferTexture();
@@ -93,10 +83,10 @@ public class Renderer {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        batch.setShader(verticalBlurShader);
+        batch.setShader(verticalBlurShader.getShaderProgram());
         verticalBlurShader.bind();
-        verticalBlurShader.setUniformf("u_resolution_y", Gdx.graphics.getHeight());
-        verticalBlurShader.setUniformf("u_radius", blurRadius);
+        verticalBlurShader.setUniformF("u_resolution_y", Gdx.graphics.getHeight());
+        verticalBlurShader.setUniformF("u_radius", blurRadius);
 
         batch.begin();
         Texture fboBTexture = fboB.getColorBufferTexture();
@@ -144,18 +134,6 @@ public class Renderer {
         batch.dispose();
         fboA.dispose();
         fboB.dispose();
-        horizontalBlurShader.dispose();
-        verticalBlurShader.dispose();
-    }
-
-    public void useCheapShader() {
-        horizontalBlurShader = horizontalBlurShader4;
-        verticalBlurShader = verticalBlurShader4;
-    }
-
-    public void useBetterShader() {
-        horizontalBlurShader = horizontalBlurShader8;
-        verticalBlurShader = verticalBlurShader8;
     }
 
     public void setStuff(Stuff stuff) {

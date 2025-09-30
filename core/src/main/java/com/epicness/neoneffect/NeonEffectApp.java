@@ -1,27 +1,30 @@
 package com.epicness.neoneffect;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 public class NeonEffectApp extends ApplicationAdapter {
 
+    private Assets assets;
     private Renderer renderer;
     private Stuff stuff;
 
-
     @Override
     public void create() {
+        assets = new Assets();
         Input input = new Input();
         Logic logic = new Logic();
         renderer = new Renderer();
         stuff = new Stuff();
 
+        logic.setAssets(assets);
         logic.setStuff(stuff);
         input.setLogic(logic);
         input.setRenderer(renderer);
         renderer.setStuff(stuff);
-        // IMPORTANT: LibGDX needs this to not crash with custom shaders
-        ShaderProgram.pedantic = false;
+        stuff.setAssets(assets);
+
+        stuff.initStuff();
+        renderer.init();
     }
 
     @Override
@@ -36,6 +39,7 @@ public class NeonEffectApp extends ApplicationAdapter {
 
     @Override
     public void dispose() {
+        assets.dispose();
         renderer.dispose();
         stuff.dispose();
     }

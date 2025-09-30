@@ -41,10 +41,10 @@ public class Input extends InputAdapter {
                 renderer.setBlurRadius(10f);
                 return false;
             case Q:
-                renderer.useCheapShader();
+                logic.useCheapShader();
                 return false;
             case W:
-                renderer.useBetterShader();
+                logic.useBetterShader();
                 return false;
         }
         return false;

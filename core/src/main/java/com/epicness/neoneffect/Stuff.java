@@ -1,14 +1,25 @@
 package com.epicness.neoneffect;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class Stuff {
 
-    private final Sprite img;
+    private Assets assets;
+    private Shader horizontalBlurShader, verticalBlurShader;
+    private Sprite img;
 
-    public Stuff() {
-        img = new Sprite(new Texture("libgdx.png")); // Your game's texture
+    public void initStuff() {
+        horizontalBlurShader = new Shader(assets.getHorizontalBlurShader4());
+        verticalBlurShader = new Shader(assets.getVerticalBlurShader4());
+        img = new Sprite(assets.getLibGDXTexture());
+    }
+
+    public Shader getHorizontalBlurShader() {
+        return horizontalBlurShader;
+    }
+
+    public Shader getVerticalBlurShader() {
+        return verticalBlurShader;
     }
 
     public Sprite getImg() {
@@ -17,5 +28,9 @@ public class Stuff {
 
     public void dispose() {
         img.getTexture().dispose();
+    }
+
+    public void setAssets(Assets assets) {
+        this.assets = assets;
     }
 }
