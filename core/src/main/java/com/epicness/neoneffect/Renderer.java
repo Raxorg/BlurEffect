@@ -33,26 +33,28 @@ public class Renderer {
     }
 
     public void render() {
-        // 1. === Render your game scene to fboA ===
+        renderToA();
+        renderAToB();
+        renderBToScreen();
+        renderNormally();
+    }
+
+    private void renderToA() {
         fboA.begin();
         Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.setProjectionMatrix(camera.combined);
         batch.setShader(null); // Use default shader for the scene
+
         batch.begin();
-
         stuff.getImg().draw(batch);
-
         batch.end();
-        fboA.end();
 
-        continueNormally();
+        fboA.end();
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
-    private void continueNormally() {
-        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-        // 2. === Render fboA to fboB using the horizontal blur shader ===
+    private void renderAToB() {
         fboB.begin();
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -74,12 +76,12 @@ public class Renderer {
             fboATexture.getWidth(),   // source width
             fboATexture.getHeight(),  // source height
             false,                    // flip horizontally
-            true);
+            true);                    // flip vertically (false for reflection effect)
         batch.end();
         fboB.end();
+    }
 
-        // 3. === Render fboB to the screen using the vertical blur shader ===
-        // (No FBO.begin() here, we're drawing to the actual screen)
+    private void renderBToScreen() {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -101,13 +103,11 @@ public class Renderer {
             fboBTexture.getWidth(),   // source width
             fboBTexture.getHeight(),  // source height
             false,                    // flip horizontally
-            true);
+            true);                    // flip vertically (false for reflection effect)
         batch.end();
 
         // Reset shader
         batch.setShader(null);
-
-        renderNormally();
     }
 
     private void renderNormally() {
