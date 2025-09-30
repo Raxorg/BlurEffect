@@ -12,6 +12,7 @@ import com.badlogic.gdx.InputAdapter;
 
 public class Input extends InputAdapter {
 
+    private Logic logic;
     private Renderer renderer;
 
     public Input() {
@@ -20,7 +21,8 @@ public class Input extends InputAdapter {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        return super.mouseMoved(screenX, screenY);
+        logic.updateSpritePosition(screenX, Gdx.graphics.getHeight() - screenY);
+        return false;
     }
 
     @Override
@@ -46,6 +48,10 @@ public class Input extends InputAdapter {
                 return false;
         }
         return false;
+    }
+
+    public void setLogic(Logic logic) {
+        this.logic = logic;
     }
 
     public void setRenderer(Renderer renderer) {

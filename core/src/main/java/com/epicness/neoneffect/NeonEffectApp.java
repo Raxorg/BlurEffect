@@ -12,9 +12,12 @@ public class NeonEffectApp extends ApplicationAdapter {
     @Override
     public void create() {
         Input input = new Input();
+        Logic logic = new Logic();
         renderer = new Renderer();
         stuff = new Stuff();
 
+        logic.setStuff(stuff);
+        input.setLogic(logic);
         input.setRenderer(renderer);
         renderer.setStuff(stuff);
         // IMPORTANT: LibGDX needs this to not crash with custom shaders

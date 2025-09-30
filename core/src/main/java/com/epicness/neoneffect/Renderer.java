@@ -51,7 +51,7 @@ public class Renderer {
         batch.setShader(null); // Use default shader for the scene
         batch.begin();
 
-        batch.draw(stuff.getImg(), Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+        stuff.getImg().draw(batch);
 
         batch.end();
         fboA.end();
@@ -122,7 +122,7 @@ public class Renderer {
 
     private void renderNormally() {
         batch.begin();
-        batch.draw(stuff.getImg(), Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+        stuff.getImg().draw(batch);
         batch.end();
     }
 
