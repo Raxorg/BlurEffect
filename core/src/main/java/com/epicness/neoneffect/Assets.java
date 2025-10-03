@@ -1,43 +1,65 @@
 package com.epicness.neoneffect;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.ShaderProgramLoader;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 public class Assets {
 
-    private final ShaderProgram horizontalBlurShader4, horizontalBlurShader8;
-    private final ShaderProgram verticalBlurShader4, verticalBlurShader8;
+    private final AssetManager assetManager;
+
+    private static final String VERTEX = "vertex.vert";
+    public static final String H_BLUR_4_FRAG = "horizontalBlur4.frag";
+    public static final String V_BLUR_4_FRAG = "verticalBlur4.frag";
+    public static final String H_BLUR_8_FRAG = "horizontalBlur8.frag";
+    public static final String V_BLUR_8_FRAG = "verticalBlur8.frag";
     private final Texture libGDXTexture;
 
     public Assets() {
+        assetManager = new AssetManager();
+
         // libGDX needs this to not crash with custom shaders
         ShaderProgram.pedantic = false;
 
-        FileHandle vertex = Gdx.files.internal("vertex.vert");
-        horizontalBlurShader4 = new ShaderProgram(vertex, Gdx.files.internal("horizontalBlur4.frag"));
-        verticalBlurShader4 = new ShaderProgram(vertex, Gdx.files.internal("verticalBlur4.frag"));
-        horizontalBlurShader8 = new ShaderProgram(vertex, Gdx.files.internal("horizontalBlur8.frag"));
-        verticalBlurShader8 = new ShaderProgram(vertex, Gdx.files.internal("verticalBlur8.frag"));
+        loadShader(H_BLUR_4_FRAG);
+        loadShader(V_BLUR_4_FRAG);
+        loadShader(H_BLUR_8_FRAG);
+        loadShader(V_BLUR_8_FRAG);
+        assetManager.finishLoading();
 
         libGDXTexture = new Texture("libgdx.png");
     }
 
+    private void loadShader(String fragment) {
+        ShaderProgramLoader.ShaderProgramParameter params = new ShaderProgramLoader.ShaderProgramParameter();
+        params.vertexFile = VERTEX;
+        params.fragmentFile = fragment;
+        assetManager.load(fragment, ShaderProgram.class, params);
+    }
+
     public ShaderProgram getHorizontalBlurShader4() {
-        return horizontalBlurShader4;
+        return getShader(H_BLUR_4_FRAG);
     }
 
     public ShaderProgram getHorizontalBlurShader8() {
-        return horizontalBlurShader8;
+        return getShader(H_BLUR_8_FRAG);
     }
 
     public ShaderProgram getVerticalBlurShader4() {
-        return verticalBlurShader4;
+        return getShader(V_BLUR_4_FRAG);
     }
 
     public ShaderProgram getVerticalBlurShader8() {
-        return verticalBlurShader8;
+        return getShader(V_BLUR_8_FRAG);
+    }
+
+    private ShaderProgram getShader(String shader) {
+        if (!assetManager.isLoaded(shader)) {
+            loadShader(shader);
+            assetManager.finishLoading();
+        }
+        return assetManager.get(shader);
     }
 
     public Texture getLibGDXTexture() {
@@ -45,10 +67,11 @@ public class Assets {
     }
 
     public void dispose() {
-        horizontalBlurShader4.dispose();
-        horizontalBlurShader8.dispose();
-        verticalBlurShader4.dispose();
-        verticalBlurShader8.dispose();
+        assetManager.dispose();
         libGDXTexture.dispose();
+    }
+
+    public void dispose(String fileName) {
+        if (assetManager.isLoaded(fileName)) assetManager.unload(fileName);
     }
 }
