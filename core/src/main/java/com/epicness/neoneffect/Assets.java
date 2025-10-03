@@ -19,9 +19,6 @@ public class Assets {
     public Assets() {
         assetManager = new AssetManager();
 
-        // libGDX needs this to not crash with custom shaders
-        ShaderProgram.pedantic = false;
-
         loadShader(H_BLUR_4_FRAG);
         loadShader(V_BLUR_4_FRAG);
         loadShader(H_BLUR_8_FRAG);
